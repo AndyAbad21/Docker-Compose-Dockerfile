@@ -1,0 +1,106 @@
+version: '3.6'
+
+services:
+  svrdb:
+    image: postgres
+    container_name: svrdb
+    hostname: svrdb
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: calificaciones
+      TZ:  America/Guayaquil
+    ports:
+      - 5432:5432
+    networks:
+      - datalogger_net
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  srvwildfly:
+    image: srvwildfly
+    build:
+      context: .
+      dockerfile: DockerfileBackend
+    container_name: srvwildfly
+    hostname: srvwildfly
+    environment:
+      TZ:  America/Guayaquil
+      JAEGER_AGENT_HOST: jaegertracingio
+      JAEGER_AGENT_PORT: 6831
+      JAEGER_SAMPLER_TYPE: const
+      JAEGER_SAMPLER_PARAM: 1
+    ports:
+      - 8082:8080
+      - 8899:8009
+      - 9992:9990
+      - 8787:8787
+    command: ["sh", "-c", "/opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0"]
+    depends_on:
+      - svrdb
+    networks:
+      - datalogger_net
+
+  admin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: info@jasoft.ec
+      PGADMIN_DEFAULT_PASSWORD: clave
+      TZ:  America/Guayaquil
+    ports:
+      - 5050:80
+    depends_on:
+      - svrdb
+    networks:
+      - datalogger_net
+
+  swaggerui:
+    depends_on:
+      - srvwildfly
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8888:8080
+    networks:
+      - datalogger_net
+
+  swaggereditor:
+    depends_on:
+      - srvwildfly
+    image: swaggerapi/swagger-editor
+    ports:
+      - 9999:8080
+    networks:
+      - datalogger_net
+
+  jaegertracingio:
+    depends_on:
+      - srvwildfly
+    image: jaegertracing/all-in-one
+    ports:
+      - 6831:6831/udp
+      - 16686:16686
+    networks:
+      - datalogger_net
+
+  angular:
+    image: angular
+    build:
+      context: .
+      dockerfile: DockerfileFrontend
+    depends_on:
+      - srvwildfly
+    ports:
+      - 3000:80
+    networks:
+      - datalogger_net
+
+volumes:
+  pg_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: 'C:\Users\GIGABYTE\data'
+
+networks:
+  datalogger_net:

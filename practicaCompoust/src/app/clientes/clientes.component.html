@@ -1,0 +1,42 @@
+<h1>ESTUDIANTE</h1>
+<form>
+  <table>
+      <tr>
+          <td>Codigo</td>
+          <td><input type="number" name="txtCodigo" [(ngModel)]="cliente.codigo"></td>
+      </tr>
+      <tr>
+          <td>Nombre</td>
+          <td><input type="text" name="txtNombre" [(ngModel)]="cliente.nombre"></td>
+      </tr>
+      <tr>
+          <td>Apellido</td>
+          <td><input type="text" name="txtDNI" [(ngModel)]="cliente.apellido"></td>
+      </tr>
+      <tr>
+          <td>Nota</td>
+          <td><input type="text" name="txtDireccion" [(ngModel)]="cliente.nota"></td>
+      </tr>
+  </table>
+  <button (click)="guardar()">Guardar</button>
+</form>
+
+<hr/>
+<table>
+  <tr>
+    <th>Codigo</th>
+    <th>Nombre</th>
+    <th>Apellido</th>
+    <th>Nota</th>
+  </tr>
+  <tr *ngFor="let cli of clientes">
+    <td>{{cli.codigo}}</td>
+    <td>{{cli.nombre}}</td>
+    <td>{{cli.apellido}}</td>
+    <td>{{cli.nota}}</td>
+    <td>
+      <button (click)="verCLiente(cli)">Actualizar/ver</button>
+      <button (click)="eliminar(cli)">Eliminar</button>
+    </td>
+  </tr>
+</table>

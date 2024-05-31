@@ -1,0 +1,170 @@
+openapi: 3.0.0
+info:
+  title: Servicio de Calificaciones
+  description: API para gestionar calificaciones.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082/DockerBackend/rest
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+paths:
+  /calificaciones/agregar:
+    post:
+      summary: Agregar una nueva calificación
+      operationId: agregarCalificacion
+      security:
+        - BasicAuth: []
+      requestBody:
+        description: Calificación a agregar
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Calificacion'
+      responses:
+        '201':
+          description: Calificación creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /calificaciones/actualizar:
+    put:
+      summary: Actualizar una calificación existente
+      operationId: actualizarCalificacion
+      security:
+        - BasicAuth: []
+      requestBody:
+        description: Calificación a actualizar
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Calificacion'
+      responses:
+        '200':
+          description: Calificación actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calificacion'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /calificaciones/eliminar:
+    delete:
+      summary: Eliminar una calificación por código
+      operationId: eliminarCalificacion
+      security:
+        - BasicAuth: []
+      parameters:
+        - name: codigo
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Código de la calificación a eliminar
+      responses:
+        '200':
+          description: Calificación eliminada
+          content:
+            application/json:
+              schema:
+                type: string
+                example: OK
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Error
+
+  /calificaciones/listar:
+    get:
+      summary: Listar todas las calificaciones
+      operationId: listarCalificaciones
+      security:
+        - BasicAuth: []
+      responses:
+        '200':
+          description: Lista de calificaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Calificacion'
+        '500':
+          description: No existen calificaciones
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /calificaciones/buscar:
+    get:
+      summary: Buscar una calificación por código
+      operationId: buscarCalificacion
+      security:
+        - BasicAuth: []
+      parameters:
+        - name: codigo
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Código de la calificación a buscar
+      responses:
+        '200':
+          description: Calificación encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calificacion'
+        '500':
+          description: No existe la calificación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+components:
+  schemas:
+    Calificacion:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        nota:
+          type: number
+          format: float
+          example: 9.5
+
+    ErrorMessage:
+      type: object
+      properties:
+        codigo:
+          type: integer
+          example: 10
+        mensaje:
+          type: string
+          example: "Error interno del servidor"
